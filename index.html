@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Research Papers & Project Documentation</title>
+    <!-- Tailwind CSS for utility styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', "Segoe UI", 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'Menlo', 'Monaco', 'Consolas', "Liberation Mono", "Courier New", 'monospace']
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Custom editorial tweaks for academic/minimalist feel */
+        body {
+            background-color: #fafafa;
+            color: #111111;
+        }
+        .academic-border {
+            border-color: #e5e5e5;
+        }
+        /* Custom scrollbar for minimalist look */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cccccc;
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #999999;
+        }
+    </style>
+</head>
+<body class="font-sans antialiased min-h-screen flex flex-col selection:bg-neutral-900 selection:text-white">
+
+    <!-- Top Navigation Bar -->
+    <header class="border-b academic-border bg-white sticky top-0 z-30">
+        <div class="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <span class="font-mono text-xs bg-neutral-900 text-white px-2 py-1 tracking-wider uppercase font-semibold">PORTFOLIO</span>
+                <a href="#" class="font-semibold tracking-tight text-neutral-900 hover:text-neutral-600 transition-colors">Research & Documentation</a>
+            </div>
+            <nav class="hidden md:flex items-center space-x-8 text-sm text-neutral-600 font-medium">
+                <a href="#papers" class="hover:text-neutral-900 transition-colors">Papers & Docs</a>
+            </nav>
+            <div class="flex items-center space-x-3">
+                <button onclick="openUploadModal()" class="text-xs font-mono font-medium bg-neutral-900 hover:bg-neutral-800 text-white px-3.5 py-2 transition-colors flex items-center space-x-1.5">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                    <span>Publish Document</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Container -->
+    <main class="flex-grow max-w-6xl mx-auto w-full px-6 py-10">
+        
+        <!-- Hero Section -->
+        <section class="mb-12 pb-10 border-b academic-border">
+            <div class="max-w-3xl">
+                <p class="font-mono text-xs text-neutral-500 uppercase tracking-wider mb-2">Academic Portfolio & Project Documentation</p>
+                <h1 class="text-3xl md:text-4xl font-normal tracking-tight text-neutral-900 mb-4">Research Papers & Technical Reports</h1>
+            </div>
+
+            <!-- Search and Filter Bar -->
+            <div class="mt-8 flex flex-col sm:flex-row gap-3 items-center justify-between">
+                <div class="relative w-full sm:w-96">
+                    <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-neutral-400">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                    </span>
+                    <input type="text" id="searchInput" oninput="filterPapers()" placeholder="Search by title, author, or keyword..." 
+                        class="w-full pl-9 pr-4 py-2 bg-white border academic-border text-sm text-neutral-900 placeholder-neutral-400 focus:outline-none focus:border-neutral-900 transition-colors">
+                </div>
+                <div class="flex items-center space-x-2 w-full sm:w-auto justify-end text-xs font-mono text-neutral-500">
+                    <span>Showing <span id="paperCount" class="text-neutral-900 font-semibold">0</span> records</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Papers Listing & Viewer Grid -->
+        <div id="papers" class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+            
+            <!-- Papers List Column -->
+            <div id="paperListContainer" class="lg:col-span-12 space-y-4 transition-all duration-300">
+                <!-- Dynamic papers will be injected here -->
+            </div>
+
+        </div>
+
+    </main>
+
+    <!-- Embedded PDF Viewer Modal / Drawer Overlay -->
+    <div id="pdfModal" class="fixed inset-0 z-50 bg-neutral-900/40 backdrop-blur-xs hidden flex items-center justify-center p-4 md:p-8">
+        <div class="bg-white border academic-border w-full max-w-5xl h-[90vh] flex flex-col shadow-2xl">
+            <!-- Modal Header -->
+            <div class="px-6 py-4 border-b academic-border flex items-center justify-between bg-neutral-50">
+                <div>
+                    <span id="modalPaperType" class="font-mono text-[10px] uppercase tracking-wider bg-neutral-200 text-neutral-700 px-2 py-0.5 mr-2">Research Paper</span>
+                    <h3 id="modalPaperTitle" class="font-medium text-neutral-900 text-sm md:text-base inline-block truncate max-w-lg">Paper Title</h3>
+                </div>
+                <div class="flex items-center space-x-3">
+                    <a id="modalDownloadBtn" href="#" target="_blank" class="text-xs font-mono font-medium px-3 py-1.5 border academic-border bg-white hover:bg-neutral-50 text-neutral-900 transition-colors flex items-center space-x-1">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                        <span>Download PDF</span>
+                    </a>
+                    <button onclick="closePdfModal()" class="p-1.5 text-neutral-400 hover:text-neutral-900 transition-colors">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                    </button>
+                </div>
+            </div>
+            <!-- Modal Body (PDF Embed/Iframe) -->
+            <div class="flex-grow bg-neutral-100 relative">
+                <iframe id="pdfFrame" src="" class="w-full h-full border-0" title="PDF Viewer"></iframe>
+                <div id="pdfLoadingFallback" class="absolute inset-0 flex items-center justify-center bg-white flex-col space-y-3 p-6 text-center hidden">
+                    <p class="text-sm font-mono text-neutral-600">Loading document viewer...</p>
+                    <p class="text-xs text-neutral-400 max-w-md">If the PDF fails to render directly inside your browser iframe due to cross-origin headers, use the direct download button above.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Upload/Publish Paper Modal Form -->
+    <div id="uploadModal" class="fixed inset-0 z-50 bg-neutral-900/40 backdrop-blur-xs hidden flex items-center justify-center p-4">
+        <div class="bg-white border academic-border w-full max-w-lg p-6 shadow-2xl">
+            <div class="flex items-center justify-between pb-4 border-b academic-border mb-4">
+                <h3 class="font-medium text-neutral-900">Publish New Paper or Documentation</h3>
+                <button onclick="closeUploadModal()" class="text-neutral-400 hover:text-neutral-900">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+            <form id="publishForm" onsubmit="handlePublish(event)" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-mono uppercase tracking-wider text-neutral-600 mb-1">Document Title *</label>
+                    <input type="text" id="newTitle" required placeholder="e.g. Decentralized Consensus Protocols in Low-Bandwidth Networks" 
+                        class="w-full px-3 py-2 bg-neutral-50 border academic-border text-sm text-neutral-900 focus:outline-none focus:border-neutral-900">
+                </div>
+                <div>
+                    <label class="block text-xs font-mono uppercase tracking-wider text-neutral-600 mb-1">Authors (comma separated) *</label>
+                    <input type="text" id="newAuthors" required placeholder="e.g. A. Smith, J. Doe" 
+                        class="w-full px-3 py-2 bg-neutral-50 border academic-border text-sm text-neutral-900 focus:outline-none focus:border-neutral-900">
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-mono uppercase tracking-wider text-neutral-600 mb-1">Category / Type</label>
+                        <select id="newCategory" class="w-full px-3 py-2 bg-neutral-50 border academic-border text-sm text-neutral-900 focus:outline-none focus:border-neutral-900">
+                            <option value="Research Paper">Research Paper</option>
+                            <option value="Project Documentation">Project Documentation</option>
+                            <option value="Technical Report">Technical Report</option>
+                            <option value="Preprint">Preprint</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-mono uppercase tracking-wider text-neutral-600 mb-1">Publication Year</label>
+                        <input type="text" id="newYear" value="2026" required 
+                            class="w-full px-3 py-2 bg-neutral-50 border academic-border text-sm text-neutral-900 focus:outline-none focus:border-neutral-900">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs font-mono uppercase tracking-wider text-neutral-600 mb-1">PDF URL (Sample or Direct Link) *</label>
+                    <input type="url" id="newPdfUrl" required placeholder="https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf" 
+                        class="w-full px-3 py-2 bg-neutral-50 border academic-border text-sm text-neutral-900 focus:outline-none focus:border-neutral-900">
+                    <p class="text-[11px] text-neutral-400 mt-1">Tip: You can use any direct public PDF link or sample URL.</p>
+                </div>
+                <div>
+                    <label class="block text-xs font-mono uppercase tracking-wider text-neutral-600 mb-1">Abstract / Summary *</label>
+                    <textarea id="newAbstract" rows="3" required placeholder="Enter a concise summary of your research findings or project documentation..."
+                        class="w-full px-3 py-2 bg-neutral-50 border academic-border text-sm text-neutral-900 focus:outline-none focus:border-neutral-900 resize-none"></textarea>
+                </div>
+                <div class="pt-2 flex justify-end space-x-3">
+                    <button type="button" onclick="closeUploadModal()" class="px-4 py-2 border academic-border text-xs font-mono text-neutral-700 hover:bg-neutral-50">Cancel</button>
+                    <button type="submit" class="px-4 py-2 bg-neutral-900 hover:bg-neutral-800 text-white text-xs font-mono">Publish Document</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Minimalist Footer -->
+    <footer class="border-t academic-border mt-auto bg-white py-8">
+        <div class="max-w-6xl mx-auto px-6 flex flex-col sm:flex-row items-center justify-between text-xs font-mono text-neutral-500">
+            <p>&copy; 2026 Academic Research & Project Documentation Portfolio.</p>
+            <div class="mt-4 sm:mt-0 text-neutral-400">
+                Built with Gemini for academic submissions.
+            </div>
+        </div>
+    </footer>
+
+    <!-- JavaScript Application Logic -->
+    <script>
+        // Initial empty dataset (clean state without placeholder PDFs)
+        let papers = [];
+
+        // Render papers list
+        function renderPapers(filteredPapers = papers) {
+            const container = document.getElementById('paperListContainer');
+            document.getElementById('paperCount').textContent = filteredPapers.length;
+
+            if (filteredPapers.length === 0) {
+                container.innerHTML = `
+                    <div class="p-16 text-center bg-white border academic-border flex flex-col items-center justify-center space-y-3">
+                        <svg class="w-10 h-10 text-neutral-300 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                        <p class="font-mono text-sm text-neutral-700 font-medium">No research papers or documentation published yet.</p>
+                        <p class="text-xs text-neutral-500 max-w-sm">Click the "Publish Document" button in the top right to upload or link your PDF research papers and project files.</p>
+                        <button onclick="openUploadModal()" class="mt-3 text-xs font-mono bg-neutral-900 text-white px-4 py-2 hover:bg-neutral-800 transition-colors">Publish First Document</button>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = filteredPapers.map(paper => `
+                <div class="bg-white border academic-border p-6 transition-all hover:border-neutral-400">
+                    <div class="flex flex-col md:flex-row md:items-center justify-between gap-2 mb-2">
+                        <div class="flex items-center space-x-2 flex-wrap gap-y-1">
+                            <span class="font-mono text-[10px] uppercase tracking-wider bg-neutral-100 text-neutral-700 px-2 py-0.5 border academic-border">${paper.category}</span>
+                            <span class="font-mono text-xs text-neutral-400">${paper.year}</span>
+                        </div>
+                        <div class="flex items-center space-x-3 text-xs font-mono">
+                            <button onclick="openPdfViewer('${paper.title}', '${paper.pdfUrl}', '${paper.category}')" class="text-neutral-900 hover:text-neutral-600 underline underline-offset-4 font-medium flex items-center space-x-1">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+                                <span>Read PDF Viewer</span>
+                            </button>
+                            <span class="text-neutral-300">|</span>
+                            <a href="${paper.pdfUrl}" target="_blank" class="text-neutral-600 hover:text-neutral-900">Download</a>
+                        </div>
+                    </div>
+                    
+                    <h2 class="text-lg font-medium text-neutral-900 mb-1 hover:text-neutral-600 transition-colors cursor-pointer" onclick="openPdfViewer('${paper.title}', '${paper.pdfUrl}', '${paper.category}')">
+                        ${paper.title}
+                    </h2>
+                    
+                    <p class="text-xs font-mono text-neutral-500 mb-4">${paper.authors}</p>
+                    
+                    <div class="text-sm text-neutral-700 leading-relaxed">
+                        <p class="${paper.expanded ? '' : 'line-clamp-2'}">
+                            <strong class="font-medium text-neutral-900 font-mono text-xs uppercase tracking-wider mr-1">Abstract:</strong> ${paper.abstract}
+                        </p>
+                        <button onclick="toggleAbstract(${paper.id})" class="mt-2 text-xs font-mono text-neutral-500 hover:text-neutral-900 underline">
+                            ${paper.expanded ? 'Show less' : 'Read full abstract'}
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Filter papers based on search input
+        function filterPapers() {
+            const query = document.getElementById('searchInput').value.toLowerCase();
+            const filtered = papers.filter(p => 
+                p.title.toLowerCase().includes(query) || 
+                p.authors.toLowerCase().includes(query) || 
+                p.abstract.toLowerCase().includes(query) ||
+                p.category.toLowerCase().includes(query)
+            );
+            renderPapers(filtered);
+        }
+
+        // Toggle abstract expansion
+        function toggleAbstract(id) {
+            const paper = papers.find(p => p.id === id);
+            if (paper) {
+                paper.expanded = !paper.expanded;
+                filterPapers();
+            }
+        }
+
+        // PDF Modal Viewer Handlers
+        function openPdfViewer(title, url, category) {
+            document.getElementById('modalPaperTitle').textContent = title;
+            document.getElementById('modalPaperType').textContent = category;
+            document.getElementById('modalDownloadBtn').href = url;
+            
+            const frame = document.getElementById('pdfFrame');
+            frame.src = url;
+
+            document.getElementById('pdfModal').classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closePdfModal() {
+            document.getElementById('pdfModal').classList.add('hidden');
+            document.getElementById('pdfFrame').src = '';
+            document.body.style.overflow = 'auto';
+        }
+
+        // Upload/Publish Modal Handlers
+        function openUploadModal() {
+            document.getElementById('uploadModal').classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeUploadModal() {
+            document.getElementById('uploadModal').classList.add('hidden');
+            document.body.style.overflow = 'auto';
+        }
+
+        function handlePublish(event) {
+            event.preventDefault();
+            const newPaper = {
+                id: Date.now(),
+                title: document.getElementById('newTitle').value,
+                authors: document.getElementById('newAuthors').value,
+                category: document.getElementById('newCategory').value,
+                year: document.getElementById('newYear').value,
+                pdfUrl: document.getElementById('newPdfUrl').value,
+                abstract: document.getElementById('newAbstract').value,
+                expanded: false
+            };
+
+            papers.unshift(newPaper);
+            filterPapers();
+            closeUploadModal();
+            document.getElementById('publishForm').reset();
+        }
+
+        // Initialize view on load
+        window.onload = function() {
+            renderPapers();
+        }
+    </script>
+</body>
+</html>
